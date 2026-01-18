@@ -1,0 +1,92 @@
+k8s-monitoring:
+  cluster:
+    name: monitoring-lab
+
+  # Destinations - where to send telemetry
+  destinations:
+    - name: prometheus
+      type: prometheus
+      url: http://prometheus-server.monitoring.svc:80/api/v1/write
+    - name: loki
+      type: loki
+      url: http://loki.monitoring.svc:3100/loki/api/v1/push
+
+  # Enable Alloy for collection
+  alloy:
+    alloy:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+  # Metrics collection
+  metrics:
+    enabled: true
+    # Forward to our Prometheus
+    destination:
+      - prometheus
+
+    # Kubernetes components to scrape
+    kubeApiServer:
+      enabled: true
+    kubelet:
+      enabled: true
+    kubeControllerManager:
+      enabled: false  # Not accessible on EKS
+    kubeScheduler:
+      enabled: false  # Not accessible on EKS
+    kubeProxy:
+      enabled: true
+    cadvisor:
+      enabled: true
+    kubeDns:
+      enabled: true
+    cost:
+      enabled: false
+
+    # Enable kube-state-metrics
+    kubeStateMetrics:
+      enabled: true
+      service:
+        port: 8080
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+
+    # Enable node-exporter
+    nodeExporter:
+      enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 64Mi
+
+  # Log collection
+  logs:
+    enabled: true
+    destination:
+      - loki
+    
+    # Collect pod logs
+    podLogs:
+      enabled: true
+
+  # Disable components we're deploying separately
+  prometheus:
+    enabled: false  # Using our own Prometheus
+
+  loki:
+    enabled: false  # Using our own Loki
+
+  grafana:
+    enabled: false  # Using our own Grafana
