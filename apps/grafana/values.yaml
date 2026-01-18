@@ -1,0 +1,38 @@
+grafana:
+  # Expose as LoadBalancer for easy access
+  service:
+    type: LoadBalancer
+
+  # Admin credentials
+  adminUser: admin
+  adminPassword: admin
+
+  # Persistent storage for dashboards
+  persistence:
+    enabled: true
+    storageClassName: gp2
+    size: 5Gi
+
+  # Pre-configure data sources
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus-server.monitoring.svc:80
+          access: proxy
+          isDefault: true
+        - name: Loki
+          type: loki
+          url: http://loki.monitoring.svc:3100
+          access: proxy
+
+  # Resources for lab environment
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

@@ -1,0 +1,65 @@
+loki:
+  # Single binary mode for lab simplicity
+  deploymentMode: SingleBinary
+
+  singleBinary:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+  # Disable distributed components
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  backend:
+    replicas: 0
+
+  # Use filesystem storage (no S3 needed)
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    storage:
+      type: filesystem
+    schemaConfig:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+
+  # Persistent storage
+  singleBinary:
+    persistence:
+      enabled: true
+      storageClass: gp2
+      size: 10Gi
+
+  # Expose as LoadBalancer for lab access
+  gateway:
+    enabled: false
+
+  service:
+    type: LoadBalancer
+
+  # Disable unnecessary components
+  monitoring:
+    selfMonitoring:
+      enabled: false
+    lokiCanary:
+      enabled: false
+  test:
+    enabled: false
+  chunksCache:
+    enabled: false
+  resultsCache:
+    enabled: false
