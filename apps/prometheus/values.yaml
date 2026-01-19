@@ -9,17 +9,14 @@ prometheus:
     service:
       type: LoadBalancer
 
-    # Enable remote write receiver so Alloy can push metrics
     extraFlags:
       - "web.enable-remote-write-receiver"
 
-    # Persistent storage
     persistentVolume:
       enabled: true
       storageClass: "gp2"
       size: 10Gi
 
-    # Resource limits for lab environment
     resources:
       requests:
         cpu: 250m
