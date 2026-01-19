@@ -110,9 +110,9 @@ module "eks" {
 
       instance_types = ["t3.medium"]
 
-      min_size     = 2
-      max_size     = 3
-      desired_size = 2
+      min_size     = 4
+      max_size     = 5
+      desired_size = 4
     }
   }
 }
@@ -146,4 +146,5 @@ output "cluster_endpoint" {
 output "configure_kubectl" {
   description = "Run this command to configure kubectl"
   value       = "aws eks update-kubeconfig --region ${var.region} --name ${module.eks.cluster_name}"
+
 }
