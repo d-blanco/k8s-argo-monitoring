@@ -5,8 +5,8 @@ metadata:
   namespace: mysql
 type: Opaque
 stringData:
-  # Connection string for the exporter
-  DATA_SOURCE_NAME: "root:rootpassword@(mysql:3306)/"
+  # Connection string for the exporter (dedicated user with minimal privileges)
+  DATA_SOURCE_NAME: "exporter:exporterpassword@(mysql:3306)/"
 ---
 apiVersion: apps/v1
 kind: Deployment

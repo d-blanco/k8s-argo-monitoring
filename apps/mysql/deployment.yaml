@@ -17,6 +17,18 @@ stringData:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: mysql-init
+  namespace: mysql
+data:
+  init-exporter.sql: |
+    -- Create exporter user with required privileges
+    CREATE USER IF NOT EXISTS 'exporter'@'%' IDENTIFIED BY 'exporterpassword' WITH MAX_USER_CONNECTIONS 3;
+    GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'exporter'@'%';
+    FLUSH PRIVILEGES;
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: mysql-config
   namespace: mysql
 data:
@@ -86,6 +98,8 @@ spec:
               mountPath: /etc/mysql/conf.d
             - name: mysql-logs
               mountPath: /var/log/mysql
+            - name: mysql-init
+              mountPath: /docker-entrypoint-initdb.d
           resources:
             requests:
               memory: "512Mi"
@@ -124,6 +138,9 @@ spec:
             name: mysql-config
         - name: mysql-logs
           emptyDir: {}
+        - name: mysql-init
+          configMap:
+            name: mysql-init
 ---
 apiVersion: v1
 kind: Service
