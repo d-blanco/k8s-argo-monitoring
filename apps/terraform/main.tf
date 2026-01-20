@@ -108,7 +108,7 @@ resource "aws_security_group" "allow_all" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.8.5"
+  version = "20.31.0"
 
   cluster_name    = local.cluster_name
   cluster_version = "1.33"
