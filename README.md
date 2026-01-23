@@ -2,14 +2,30 @@
 
 Quick setup guide for deploying the monitoring stack on EKS with ArgoCD.
 
-## 1. Deploy EKS with Terraform
+## 1. Deploy EKS with AWS eksctl
 
 ```bash
-cd apps/terraform
+ssh-keygen -t rsa -b 2048 -f ~/.ssh/gitops-eks-key
 
-terraform init
-terraform plan
-terraform apply
+aws ec2 import-key-pair \
+  --region us-east-1 \
+  --key-name gitops-eks-key \
+  --public-key-material fileb://~/.ssh/gitops-eks-key.pub
+
+eksctl create cluster \
+  --name monitoring-lab \
+  --region us-east-1 \
+  --nodes 3 \
+  --node-type t3.large \
+  --with-oidc \
+  --ssh-access \
+  --ssh-public-key gitops-eks-key \
+  --managed
+
+  eksctl create addon \
+  --name aws-ebs-csi-driver \
+  --cluster monitoring-lab \
+  --region us-east-1
 ```
 
 ## 2. Configure kubectl
