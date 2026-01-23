@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: automation-gateway
-        image: aguajosh/automation-gateway:0.1.0
+        image: aguajosh/automation-gateway:0.1.1
         imagePullPolicy: Always
         ports:
         - name: http
