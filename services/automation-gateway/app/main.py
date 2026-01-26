@@ -3,6 +3,13 @@ from __future__ import annotations
 import random
 import time
 import uuid
+
+import time
+import httpx
+from opentelemetry import trace
+
+tracer = trace.get_tracer(__name__)
+
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
@@ -164,3 +171,23 @@ def get_job(job_id: str) -> JobStatusResponse:
 def metrics() -> Response:
     data = generate_latest()
     return Response(content=data, media_type=CONTENT_TYPE_LATEST)
+
+@app.get("/lab/span-demo")
+def span_demo(ms: int = 150, fail: bool = False):
+    with tracer.start_as_current_span("business_logic") as span:
+        span.set_attribute("demo.ms", ms)
+        time.sleep(ms / 1000)
+
+        with tracer.start_as_current_span("downstream_work"):
+            time.sleep(0.05)
+
+        if fail:
+            raise RuntimeError("boom (intentional)")
+
+    return {"ok": True, "slept_ms": ms, "fail": fail}
+
+
+@app.get("/lab/http-child")
+def http_child():
+    r = httpx.get("https://example.com", timeout=5.0)
+    return {"status": r.status_code}
